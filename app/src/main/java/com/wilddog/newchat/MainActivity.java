@@ -22,9 +22,6 @@ import java.util.Random;
 
 public class MainActivity extends ListActivity {
 
-
-
-
     private String mUsername;
     private SyncReference mWilddogRef;
     private ValueEventListener mConnectedListener;
@@ -103,6 +100,7 @@ public class MainActivity extends ListActivity {
     @Override
     public void onStop() {
         super.onStop();
+        //  .info/connected 是 Wilddog Sync 提供的一个保留路径，用于存储客户端与云端的连接状态。
         mWilddogRef.getRoot().child(".info/connected").removeEventListener(mConnectedListener);
         mChatListAdapter.cleanup();
     }

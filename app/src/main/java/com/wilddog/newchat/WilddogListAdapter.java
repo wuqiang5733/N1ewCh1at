@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @param <T> The class type to use as a model for the data contained in the children of the given Wilddog location
  */
+// public       class          ArrayList<E> extends AbstractList<E>
 public abstract class WilddogListAdapter<T> extends BaseAdapter {
 
     private Query mRef;
@@ -43,11 +44,13 @@ public abstract class WilddogListAdapter<T> extends BaseAdapter {
     /**
      * @param mRef        The Wilddog location to watch for data changes. Can also be a slice of a location, using some
      *                    combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>,
+     *                                 配置
      * @param mModelClass Wilddog will marshall the data at a location into an instance of a class that you provide
      * @param mLayout     This is the mLayout used to represent a single list item. You will be responsible for populating an
      *                    instance of the corresponding view with the data from an instance of mModelClass.
      * @param activity    The activity containing the ListView
      */
+    //       mWilddogRef.limitToLast(50),  Chat.class,       R.layout.chat_message, MainActivity
     public WilddogListAdapter(Query mRef, Class<T> mModelClass, int mLayout, Activity activity) {
         this.mRef = mRef;
         this.mModelClass = mModelClass;
@@ -58,20 +61,28 @@ public abstract class WilddogListAdapter<T> extends BaseAdapter {
         // Look for all child events. We will then map them to our own internal ArrayList, which backs ListView
         mListener = this.mRef.addChildEventListener(new ChildEventListener() {
             @Override
+            // 一个添加了listener的节点，当有子节点被添加时触发此方法。
+            // DataSnapshot 新添加的子节点数据快照。
+            // String 排在被添加的新子节点前面的兄弟节点的key值。如果被添加的是当前节点的第一个子节点，该值为null。
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
 
-                T model = (T) dataSnapshot.getValue(WilddogListAdapter.this.mModelClass);
+                // Object getValue() 从快照中获得当前节点的数据。
+//                T model = (T) dataSnapshot.getValue(WilddogListAdapter.this.mModelClass);
+                T model = (T) dataSnapshot.getValue(Chat.class); // 奇迹就这样发生了 。。。。
+                Log.d("model_model",model.getClass().toString());
+                Log.d("model_model",model.toString());
+                // getKey()  获取当前节点的名称。从快照中，获取当前节点的名称。
                 String key = dataSnapshot.getKey();
 
                 // Insert into the correct location, based on previousChildName
-                if (previousChildName == null) {
+                if (previousChildName == null) { // 如果这是第一个节点的话
                     mModels.add(0, model);
                     mKeys.add(0, key);
                 } else {
                     int previousIndex = mKeys.indexOf(previousChildName);
                     int nextIndex = previousIndex + 1;
                     if (nextIndex == mModels.size()) {
-                        mModels.add(model);
+                        mModels.add(model);  // ？ 这个是会自动变长 ?
                         mKeys.add(key);
                     } else {
                         mModels.add(nextIndex, model);
@@ -83,8 +94,10 @@ public abstract class WilddogListAdapter<T> extends BaseAdapter {
             }
 
             @Override
+            // 当前节点的子节点发生改变的时候触发此方法。
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 // One of the mModels changed. Replace it in our list and name mapping
+                // getKey()  获取当前节点的名称。
                 String key = dataSnapshot.getKey();
                 T newModel = (T) dataSnapshot.getValue(WilddogListAdapter.this.mModelClass);
                 int index = mKeys.indexOf(key);
@@ -142,6 +155,7 @@ public abstract class WilddogListAdapter<T> extends BaseAdapter {
     }
 
     public void cleanup() {
+        // 当listener在服务端失败，或者被删除的时候调用该方法。
         // We're being destroyed, let go of our mListener and forget about all of the mModels
         mRef.removeEventListener(mListener);
         mModels.clear();
