@@ -1,14 +1,13 @@
 package com.wilddog.newchat;
 
-import android.app.ListActivity;
 import android.content.SharedPreferences;
-import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,12 +19,14 @@ import com.wilddog.client.WilddogSync;
 
 import java.util.Random;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends AppCompatActivity {
 
     private String mUsername;
     private SyncReference mWilddogRef;
     private ValueEventListener mConnectedListener;
     private com.wilddog.newchat.ChatListAdapter mChatListAdapter;
+    /************************/
+    private MessagesAdapter _adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,17 +67,23 @@ public class MainActivity extends ListActivity {
     public void onStart() {
         super.onStart();
         // Setup our view and list adapter. Ensure it scrolls to the bottom as data changes
-        final ListView listView = getListView();
+//        final ListView listView = getListView();
         // Tell our list adapter that we only want 50 messages at a time
-        mChatListAdapter = new com.wilddog.newchat.ChatListAdapter(mWilddogRef.limitToLast(50), this, R.layout.chat_message, mUsername);
-        listView.setAdapter(mChatListAdapter);
-        mChatListAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                listView.setSelection(mChatListAdapter.getCount() - 1);
-            }
-        });
+//        mChatListAdapter = new com.wilddog.newchat.ChatListAdapter(mWilddogRef.limitToLast(50), this, R.layout.chat_message, mUsername);
+        mChatListAdapter = new com.wilddog.newchat.ChatListAdapter(mWilddogRef.limitToLast(50), this, R.layout.msg_item, mUsername);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.activity_sent_messages_messages);
+        recyclerView.setAdapter(_adapter);
+
+
+//        listView.setAdapter(mChatListAdapter);
+//        mChatListAdapter.registerDataSetObserver(new DataSetObserver() {
+//            @Override
+//            public void onChanged() {
+//                super.onChanged();
+//                listView.setSelection(mChatListAdapter.getCount() - 1);
+//            }
+//        });
 
         // Finally, a little indication of connection status
         mConnectedListener = mWilddogRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
