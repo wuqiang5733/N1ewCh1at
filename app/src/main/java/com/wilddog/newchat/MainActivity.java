@@ -111,7 +111,7 @@ public class MainActivity extends ListActivity {
         if (mUsername == null) {
             Random r = new Random();
             // Assign a random user name if we don't have one saved.
-            mUsername = "WilddogUser" + r.nextInt(100000);
+            mUsername = "xiaoxiao" + r.nextInt(100000);
             prefs.edit().putString("username", mUsername).commit();
         }
     }
