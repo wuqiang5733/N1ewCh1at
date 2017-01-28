@@ -3,6 +3,7 @@ package com.wilddog.newchat;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,10 +34,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setTitle("XIAOXIAO");
         // Make sure we have a mUsername
         setupUsername();
 
-        setTitle("Chatting as " + mUsername);
+//        setTitle("Chatting as " + mUsername);
 
         // Setup our Wilddog mWilddogRef
         mWilddogRef = WilddogSync.getInstance().getReference().child("chat");
@@ -72,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
 //        mChatListAdapter = new com.wilddog.newchat.ChatListAdapter(mWilddogRef.limitToLast(50), this, R.layout.chat_message, mUsername);
         mChatListAdapter = new com.wilddog.newchat.ChatListAdapter(mWilddogRef.limitToLast(50), this, R.layout.msg_item, mUsername);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.activity_sent_messages_messages);
-        recyclerView.setAdapter(_adapter);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.activity_sent_messages_messages);
+        recyclerView.setAdapter(mChatListAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
 //        listView.setAdapter(mChatListAdapter);
@@ -84,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
 //                listView.setSelection(mChatListAdapter.getCount() - 1);
 //            }
 //        });
+        mChatListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                recyclerView.scrollToPosition((mChatListAdapter.getItemCount() - 1));
+            }
+        });
 
         // Finally, a little indication of connection status
         mConnectedListener = mWilddogRef.getRoot().child(".info/connected").addValueEventListener(new ValueEventListener() {
@@ -91,9 +101,11 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean connected = (Boolean) dataSnapshot.getValue();
                 if (connected) {
-                    Toast.makeText(MainActivity.this, "Connected to Wilddog", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Connected to Wilddog", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "联接到服务器", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "Disconnected from Wilddog", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Disconnected from Wilddog", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "已从服务器断开", Toast.LENGTH_SHORT).show();
                 }
             }
 

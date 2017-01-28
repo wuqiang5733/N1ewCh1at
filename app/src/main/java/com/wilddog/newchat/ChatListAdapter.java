@@ -2,6 +2,7 @@ package com.wilddog.newchat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
 
 import com.wilddog.client.Query;
 
@@ -51,7 +52,19 @@ public class ChatListAdapter extends MessagesAdapter<Chat> {
     }
     */
     @Override
-    protected void populateView(Context context, Chat chat) {
-
+    protected void populateView(Context context, MessageViewHolder holder, Chat chat) {
+        // 设置发送者
+        String author = chat.getAuthor();
+        // 根据是不是自己发的，改变 发送者 颜色
+        if (author != null && author.equals(mUsername)) {
+            holder.rightLayout.setVisibility(View.VISIBLE);
+            holder.leftLayout.setVisibility(View.GONE);
+            holder.rightMsg.setText(chat.getMessage());
+        } else {
+            // 如果是收到的消息，则显示左边的消息布局，将右边的消息布局隐藏
+            holder.leftLayout.setVisibility(View.VISIBLE);
+            holder.rightLayout.setVisibility(View.GONE);
+            holder.leftMsg.setText(chat.getMessage());
+        }
     }
 }

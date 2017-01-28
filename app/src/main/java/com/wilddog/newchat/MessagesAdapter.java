@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.wilddog.client.ChildEventListener;
 import com.wilddog.client.DataSnapshot;
@@ -16,10 +18,10 @@ import com.wilddog.client.SyncError;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageViewHolder> implements View.OnClickListener {
+public abstract class MessagesAdapter<T> extends RecyclerView.Adapter<MessagesAdapter.MessageViewHolder> implements View.OnClickListener {
     // 与 SentMessagesActivity 对应
     private final LayoutInflater _layoutInflater;
-//    private final BaseActivity _activity;
+    //    private final BaseActivity _activity;
     private final Activity _activity;
 //    private final OnMessageClickedListener _listener;
 //    private final ArrayList<Message> _messages;
@@ -32,7 +34,7 @@ public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageVi
     private List<String> mKeys;
     private ChildEventListener mListener;
 
-//    public MessagesAdapter(BaseActivity activity, OnMessageClickedListener listener) {
+    //    public MessagesAdapter(BaseActivity activity, OnMessageClickedListener listener) {
 //    public MessagesAdapter(OnMessageClickedListener listener,  Query mRef, Class<T> mModelClass, int mLayout, Activity activity) {
     public MessagesAdapter(Query mRef, Class<T> mModelClass, int mLayout, Activity activity) {
         _activity = activity;
@@ -58,8 +60,8 @@ public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageVi
                 // Object getValue() 从快照中获得当前节点的数据。
 //                T model = (T) dataSnapshot.getValue(WilddogListAdapter.this.mModelClass);
                 T model = (T) dataSnapshot.getValue(Chat.class); // 奇迹就这样发生了 。。。。
-                Log.d("model_model",model.getClass().toString());
-                Log.d("model_model",model.toString());
+                Log.d("model_model", model.getClass().toString());
+                Log.d("model_model", model.toString());
                 // getKey()  获取当前节点的名称。从快照中，获取当前节点的名称。
                 String key = dataSnapshot.getKey();
 
@@ -144,6 +146,40 @@ public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageVi
 
         });
     }
+
+    static public class MessageViewHolder extends RecyclerView.ViewHolder {
+        // 与 SentMessagesActivity 对应
+//    private ImageView _avatar;
+//    private TextView _displayName;
+//    private TextView _createdAt;
+//    private CardView _cardView;
+//    private TextView _sentReceived;
+//    private View _backgroundView;
+        LinearLayout leftLayout;
+
+        LinearLayout rightLayout;
+
+        TextView leftMsg;
+
+        TextView rightMsg;
+
+        public MessageViewHolder(LayoutInflater inflater, ViewGroup parent) {
+//        super(inflater.inflate(R.layout.list_item_message, parent, false));
+            super(inflater.inflate(R.layout.msg_item, parent, false));
+//        _cardView = (CardView) itemView;
+//        _avatar = (ImageView) itemView.findViewById(R.id.list_item_message_avatar);
+//        _displayName = (TextView) itemView.findViewById(R.id.list_item_message_displayName);
+//        _createdAt = (TextView) itemView.findViewById(R.id.list_item_message_createdAt);
+//        _sentReceived = (TextView) itemView.findViewById(R.id.list_item_message_sentReceived);
+//        _backgroundView = itemView.findViewById(R.id.list_item_message_background);
+//        super(view);
+            leftLayout = (LinearLayout) itemView.findViewById(R.id.left_layout);
+            rightLayout = (LinearLayout) itemView.findViewById(R.id.right_layout);
+            leftMsg = (TextView) itemView.findViewById(R.id.left_msg);
+            rightMsg = (TextView) itemView.findViewById(R.id.right_msg);
+        }
+    }
+
     public void cleanup() {
         // 当listener在服务端失败，或者被删除的时候调用该方法。
         // We're being destroyed, let go of our mListener and forget about all of the mModels
@@ -170,7 +206,7 @@ public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageVi
         /**********************************************************/
         T model = mModels.get(position);
 //        holder.populate(_activity, model);
-        populateView(_activity,model);
+        populateView(_activity, holder, model);
     }
 
     @Override
@@ -191,5 +227,5 @@ public abstract class MessagesAdapter<T>  extends RecyclerView.Adapter<MessageVi
 //        void onMessageClicked(Message message);
 //    }
 
-    protected abstract void populateView(Context context, T model);
+    protected abstract void populateView(Context context, MessageViewHolder holder,T model);
 }
